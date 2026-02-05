@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>All the Ways She Is</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- LANDING -->
+  <main id="landing" class="screen">
+    <div class="center">
+      <h1 class="title">All the Ways She Is</h1>
+      <p class="subtitle">Scene 1 · Take 12</p>
+
+      <button id="playBtn" class="btn btn-primary" aria-label="Play">
+        ▶ Play
+      </button>
+    </div>
+  </main>
+
+  <!-- EXPERIENCE -->
+  <main id="experience" class="screen hidden" aria-hidden="true">
+    <div class="container">
+
+      <div class="artwrap">
+        <img
+          id="posterImg"
+          src="artwork.jpg"
+          alt="All the Ways She Is — illustrated poster"
+          loading="eager"
+        />
+      </div>
+
+      <p class="caption">Every detail here is something I associate with you.</p>
+
+      <!-- Hotspot buttons (simple + mobile friendly) -->
+      <section class="hotspots" aria-label="Hotspots">
+        <button class="chip" data-text="You don’t just watch stories, you notice how they’re told.">🎬 Filmmaking</button>
+        <button class="chip" data-text="Still convinced you’d destroy me at trivia night.">🧠 Trivia / Outsmarted</button>
+        <button class="chip" data-text="Some places feel like roots.">📍 Lancaster, PA</button>
+        <button class="chip" data-text="You mentioned this once — and it stuck with me.">🎸 Guitar Hero</button>
+        <button class="chip" data-text="I love how you keep showing up for the things you enjoy.">🎧 Music</button>
+      </section>
+
+      <p id="hotspotText" class="hotspotText" aria-live="polite"></p>
+
+      <footer class="ending">
+        <p class="endingText">
+          This isn’t everything you are — just the parts I’ve been lucky enough to notice so far.
+        </p>
+        <span class="signature">— Kaustubh</span>
+      </footer>
+
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
