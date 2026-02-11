@@ -1,61 +1,391 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>All the Ways She Is</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="description" content="All the Ways She Is — Scene 1 · Take 12" />
+
+  <style>
+    :root{
+      --bg: #0b0d10;
+      --panel: rgba(255,255,255,0.06);
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.68);
+      --line: rgba(255,255,255,0.12);
+      --shadow: 0 24px 60px rgba(0,0,0,0.45);
+      --radius: 18px;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background:
+        radial-gradient(1200px 800px at 50% 10%, rgba(255,255,255,0.08), transparent 55%),
+        radial-gradient(900px 600px at 70% 90%, rgba(255,255,255,0.05), transparent 60%),
+        var(--bg);
+      color:var(--text);
+      overflow-x:hidden;
+    }
+    .wrap{ min-height:100%; display:grid; place-items:center; padding:22px 16px 40px; }
+    .screen{
+      width:min(980px,100%);
+      display:none;
+      opacity:0;
+      transform:translateY(10px);
+      transition: opacity 700ms ease, transform 700ms ease;
+    }
+    .screen.active{ display:block; }
+    .screen.visible{ opacity:1; transform:translateY(0); }
+
+    /* Title card */
+    .titleCard{ text-align:center; padding:40px 14px; }
+    .title{
+      font-size: clamp(34px, 6vw, 54px);
+      letter-spacing:0.06em;
+      font-weight:650;
+      margin:0 0 10px;
+      text-transform:uppercase;
+    }
+    .subtitle{
+      font-size:15px;
+      letter-spacing:0.18em;
+      color:var(--muted);
+      margin:0 0 26px;
+      text-transform:uppercase;
+    }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:14px 18px;
+      border-radius:999px;
+      background:rgba(255,255,255,0.12);
+      border:1px solid rgba(255,255,255,0.18);
+      color:var(--text);
+      cursor:pointer;
+      user-select:none;
+      transition:transform 150ms ease, background 150ms ease, border 150ms ease;
+      box-shadow:0 18px 40px rgba(0,0,0,0.35);
+      font-weight:600;
+    }
+    .btn:hover{ transform:translateY(-1px); background:rgba(255,255,255,0.16); border-color:rgba(255,255,255,0.24); }
+    .btn:active{ transform:translateY(0); }
+
+    /* Poster card */
+    .card{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .artArea{ padding:14px; }
+    .artFrame{
+      border-radius:14px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,0.12);
+      background:rgba(0,0,0,0.25);
+      position:relative;
+    }
+
+    /* Poster fade-in */
+    .poster{
+      display:block;
+      width:100%;
+      height:auto;
+      opacity:0;
+      transform: translateY(6px);
+      transition: opacity 1200ms ease, transform 1200ms ease;
+    }
+    .poster.revealed{
+      opacity:1;
+      transform: translateY(0);
+    }
+
+    .caption{
+      padding: 10px 18px 8px;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.5;
+      text-align:center;
+    }
+
+    .toolbar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      padding: 0 18px 14px;
+      align-items:center;
+      justify-content:center;
+    }
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,0.08);
+      border:1px solid rgba(255,255,255,0.12);
+      cursor:pointer;
+      color:var(--text);
+      font-size:14px;
+      user-select:none;
+      transition:background 150ms ease, transform 150ms ease, border 150ms ease;
+    }
+    .chip:hover{ background:rgba(255,255,255,0.10); border-color:rgba(255,255,255,0.16); transform:translateY(-1px); }
+    .chip:active{ transform:translateY(0); }
+
+    /* Trivia */
+    .triviaWrap{
+      margin: 0 18px 18px;
+      border:1px solid rgba(255,255,255,0.12);
+      border-radius:14px;
+      background:rgba(0,0,0,0.18);
+      overflow:hidden;
+
+      /* collapsed by default */
+      max-height: 0;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: max-height 700ms ease, opacity 700ms ease, transform 700ms ease;
+    }
+    .triviaWrap.open{
+      max-height: 1600px; /* enough to reveal all */
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .triviaHeader{
+      padding:12px 14px;
+      border-bottom:1px solid rgba(255,255,255,0.10);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .triviaTitle{
+      font-weight:650;
+      letter-spacing:0.04em;
+    }
+    .score{
+      color:rgba(255,255,255,0.75);
+      font-size:13px;
+    }
+    .q{
+      padding:14px;
+      border-bottom:1px solid rgba(255,255,255,0.08);
+    }
+    .q:last-child{ border-bottom:none; }
+    .qText{
+      margin:0 0 10px;
+      line-height:1.45;
+      font-weight:600;
+    }
+    .opts{ display:grid; gap:8px; }
+    .opt{
+      padding:10px 10px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.12);
+      background:rgba(255,255,255,0.06);
+      cursor:pointer;
+      text-align:left;
+      color:var(--text);
+      font-size:14px;
+      line-height:1.35;
+      transition:background 150ms ease, border 150ms ease, transform 150ms ease;
+    }
+    .opt:hover{ background:rgba(255,255,255,0.09); border-color:rgba(255,255,255,0.16); transform:translateY(-1px); }
+    .opt:active{ transform:translateY(0); }
+    .opt[disabled]{ cursor:default; opacity:0.85; }
+    .feedback{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.5;
+    }
+    .feedback strong{ color:var(--text); font-weight:650; }
+
+    .ending{
+      padding: 0 18px 22px;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.6;
+      text-align:center;
+    }
+    .sig{ margin-top:8px; color:rgba(255,255,255,0.78); letter-spacing:0.04em; }
+
+    @media (prefers-reduced-motion: reduce){
+      .screen,.poster,.triviaWrap{ transition:none; }
+      .btn,.chip,.opt{ transition:none; }
+    }
+  </style>
 </head>
+
 <body>
-
-  <!-- LANDING -->
-  <main id="landing" class="screen">
-    <div class="center">
-      <h1 class="title">All the Ways She Is</h1>
-      <p class="subtitle">Scene 1 · Take 12</p>
-
-      <button id="playBtn" class="btn btn-primary" aria-label="Play">
-        ▶ Play
-      </button>
-    </div>
-  </main>
-
-  <!-- EXPERIENCE -->
-  <main id="experience" class="screen hidden" aria-hidden="true">
-    <div class="container">
-
-      <div class="artwrap">
-        <img
-          id="posterImg"
-          src="poster-upscaled.png"
-          alt="All the Ways She Is — illustrated poster"
-          loading="eager"
-        />
+  <div class="wrap">
+    <!-- Title card -->
+    <section id="landing" class="screen active visible">
+      <div class="titleCard">
+        <h1 class="title">All the Ways She Is</h1>
+        <p class="subtitle">Scene 1 · Take 12</p>
+        <button id="play" class="btn"><span style="font-size:18px;">▶</span><span>Play</span></button>
       </div>
+    </section>
 
-      <p class="caption">Every detail here is something I associate with you.</p>
+    <!-- Main screen -->
+    <section id="main" class="screen">
+      <div class="card">
+        <div class="artArea">
+          <div class="artFrame">
+            <img id="poster" class="poster" src="poster-web.jpg" alt="All the Ways She Is poster artwork" />
+          </div>
+        </div>
 
-      <!-- Hotspot buttons (simple + mobile friendly) -->
-      <section class="hotspots" aria-label="Hotspots">
-        <button class="chip" data-text="You don’t just watch stories, you notice how they’re told.">🎬 Filmmaking</button>
-        <button class="chip" data-text="Still convinced you’d destroy me at trivia night.">🧠 Trivia / Outsmarted</button>
-        <button class="chip" data-text="Some places feel like roots.">📍 Lancaster, PA</button>
-        <button class="chip" data-text="You mentioned this once — and it stuck with me.">🎸 Guitar Hero</button>
-        <button class="chip" data-text="I love how you keep showing up for the things you enjoy.">🎧 Music</button>
-      </section>
+        <div class="caption">“Every detail here is something I associate with you.”</div>
 
-      <p id="hotspotText" class="hotspotText" aria-live="polite"></p>
+        <div class="toolbar">
+          <div class="chip" id="btnTrivia">🧠 Trivia Round (Director’s Cut)</div>
+        </div>
 
-      <footer class="ending">
-        <p class="endingText">
-          This isn’t everything you are — just the parts I’ve been lucky enough to notice so far.
-        </p>
-        <span class="signature">— Kaustubh</span>
-      </footer>
+        <div id="trivia" class="triviaWrap" aria-live="polite">
+          <div class="triviaHeader">
+            <div class="triviaTitle">Trivia Round</div>
+            <div class="score" id="score">Score: 0 / 4</div>
+          </div>
 
-    </div>
-  </main>
+          <div class="q" data-q="0">
+            <p class="qText">🎬 What will make the close-up in this movie unforgettable?</p>
+            <div class="opts">
+              <button class="opt" data-a="A">A) The score</button>
+              <button class="opt" data-a="B">B) Green eyes</button>
+              <button class="opt" data-a="C">C) Perfect lighting</button>
+            </div>
+            <div class="feedback" hidden></div>
+          </div>
 
-  <script src="script.js"></script>
+          <div class="q" data-q="1">
+            <p class="qText">🎥 What’s the most important thing about a film?</p>
+            <div class="opts">
+              <button class="opt" data-a="A">A) Budget</button>
+              <button class="opt" data-a="B">B) Effects</button>
+              <button class="opt" data-a="C">C) Story</button>
+            </div>
+            <div class="feedback" hidden></div>
+          </div>
+
+          <div class="q" data-q="2">
+            <p class="qText">🎮 Is it wise to challenge Liv at Guitar Hero or Outsmarted?</p>
+            <div class="opts">
+              <button class="opt" data-a="A">A) Absolutely</button>
+              <button class="opt" data-a="B">B) Probably not</button>
+            </div>
+            <div class="feedback" hidden></div>
+          </div>
+
+          <div class="q" data-q="3">
+            <p class="qText">🎞 What keeps a movie worth continuing to watch?</p>
+            <div class="opts">
+              <button class="opt" data-a="A">A) The beginning</button>
+              <button class="opt" data-a="B">B) The story</button>
+              <button class="opt" data-a="C">C) What will happen next</button>
+            </div>
+            <div class="feedback" hidden></div>
+          </div>
+        </div>
+
+        <div class="ending">
+          “This isn’t everything you are — just the parts I’ve been lucky enough to notice so far.”
+          <div class="sig">— Kaustubh</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const landing = document.getElementById("landing");
+    const main = document.getElementById("main");
+    const play = document.getElementById("play");
+    const poster = document.getElementById("poster");
+
+    const triviaWrap = document.getElementById("trivia");
+    const btnTrivia = document.getElementById("btnTrivia");
+    const scoreEl = document.getElementById("score");
+
+    const ANSWERS = [
+      { correct: "B",
+        onCorrect: "Correct. Some close-ups don’t need dramatic lighting or music — they just need the right eyes.",
+        onWrong: "Important too… but I’m still choosing green eyes every time."
+      },
+      { correct: "C",
+        onCorrect: "Exactly. You always notice the story behind things — and that’s something I really admire about you.",
+        onWrong: "Those matter… but story is what gives everything meaning. And you get that."
+      },
+      { correct: "B",
+        onCorrect: "Correct. I’d prefer to keep my dignity intact.",
+        onWrong: "Bold. I respect the confidence… but the odds aren’t in my favor."
+      },
+      { correct: "C",
+        onCorrect: "Exactly. That feeling of wanting to see what happens next is the best part. I’m rooting for you.",
+        onWrong: "All important… but it’s “what happens next” that keeps you leaning forward."
+      }
+    ];
+
+    let score = 0;
+
+    function showScreen(el){
+      [landing, main].forEach(s => s.classList.remove("visible","active"));
+      el.classList.add("active");
+      requestAnimationFrame(() => el.classList.add("visible"));
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function revealPoster(){
+      // delay a tiny beat so it feels like a reveal
+      setTimeout(() => poster.classList.add("revealed"), 220);
+    }
+
+    play.addEventListener("click", () => {
+      showScreen(main);
+      revealPoster();
+    });
+
+    btnTrivia.addEventListener("click", () => {
+      triviaWrap.classList.add("open");
+      triviaWrap.scrollIntoView({ behavior:"smooth", block:"start" });
+    });
+
+    function updateScore(){
+      scoreEl.textContent = `Score: ${score} / 4`;
+    }
+
+    document.querySelectorAll(".q").forEach(qEl => {
+      const qIndex = parseInt(qEl.getAttribute("data-q"), 10);
+      const opts = qEl.querySelectorAll(".opt");
+      const feedback = qEl.querySelector(".feedback");
+
+      opts.forEach(btn => {
+        btn.addEventListener("click", () => {
+          opts.forEach(b => b.disabled = true);
+
+          const chosen = btn.getAttribute("data-a");
+          const isCorrect = chosen === ANSWERS[qIndex].correct;
+
+          if(isCorrect) score += 1;
+          updateScore();
+
+          feedback.hidden = false;
+          feedback.innerHTML = isCorrect
+            ? `<strong>✓</strong> ${ANSWERS[qIndex].onCorrect}`
+            : `<strong>✕</strong> ${ANSWERS[qIndex].onWrong}`;
+
+          btn.style.borderColor = isCorrect ? "rgba(120,255,180,0.55)" : "rgba(255,140,140,0.55)";
+          btn.style.background = isCorrect ? "rgba(120,255,180,0.12)" : "rgba(255,140,140,0.10)";
+        });
+      });
+    });
+
+    updateScore();
+  </script>
 </body>
 </html>
