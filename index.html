@@ -81,28 +81,6 @@
       box-shadow:var(--shadow);
       overflow:hidden;
     }
-    .artArea{ padding:14px; }
-    .artFrame{
-      border-radius:14px;
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,0.12);
-      background:rgba(0,0,0,0.25);
-      position:relative;
-    }
-
-    /* Poster fade-in */
-    .poster{
-      display:block;
-      width:100%;
-      height:auto;
-      opacity:0;
-      transform: translateY(6px);
-      transition: opacity 1200ms ease, transform 1200ms ease;
-    }
-    .poster.revealed{
-      opacity:1;
-      transform: translateY(0);
-    }
 
     .caption{
       padding: 10px 18px 8px;
@@ -139,20 +117,18 @@
 
     /* Trivia */
     .triviaWrap{
-      margin: 0 18px 18px;
+      margin: 18px;
       border:1px solid rgba(255,255,255,0.12);
       border-radius:14px;
       background:rgba(0,0,0,0.18);
       overflow:hidden;
-
-      /* collapsed by default */
       max-height: 0;
       opacity: 0;
       transform: translateY(6px);
       transition: max-height 700ms ease, opacity 700ms ease, transform 700ms ease;
     }
     .triviaWrap.open{
-      max-height: 1600px; /* enough to reveal all */
+      max-height: 2200px;
       opacity: 1;
       transform: translateY(0);
     }
@@ -167,10 +143,6 @@
     .triviaTitle{
       font-weight:650;
       letter-spacing:0.04em;
-    }
-    .score{
-      color:rgba(255,255,255,0.75);
-      font-size:13px;
     }
     .q{
       padding:14px;
@@ -197,7 +169,7 @@
     }
     .opt:hover{ background:rgba(255,255,255,0.09); border-color:rgba(255,255,255,0.16); transform:translateY(-1px); }
     .opt:active{ transform:translateY(0); }
-    .opt[disabled]{ cursor:default; opacity:0.85; }
+
     .feedback{
       margin-top:10px;
       color:var(--muted);
@@ -205,6 +177,29 @@
       line-height:1.5;
     }
     .feedback strong{ color:var(--text); font-weight:650; }
+
+    /* Poster area */
+    .artArea{ padding:14px; }
+    .artFrame{
+      border-radius:14px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,0.12);
+      background:rgba(0,0,0,0.25);
+      position:relative;
+    }
+
+    .poster{
+      display:block;
+      width:100%;
+      height:auto;
+      opacity:0;
+      transform: translateY(6px);
+      transition: opacity 1200ms ease, transform 1200ms ease;
+    }
+    .poster.revealed{
+      opacity:1;
+      transform: translateY(0);
+    }
 
     .ending{
       padding: 0 18px 22px;
@@ -236,22 +231,13 @@
     <!-- Main screen -->
     <section id="main" class="screen">
       <div class="card">
-        <div class="artArea">
-          <div class="artFrame">
-            <img id="poster" class="poster" src="poster-web.jpg" alt="All the Ways She Is poster artwork" />
-          </div>
-        </div>
 
-        <div class="caption">“Every detail here is something I associate with you.”</div>
+        <div class="caption">Director’s Cut: a quick trivia round before the poster reveal.</div>
 
-        <div class="toolbar">
-          <div class="chip" id="btnTrivia">🧠 Trivia Round (Director’s Cut)</div>
-        </div>
-
+        <!-- Trivia FIRST -->
         <div id="trivia" class="triviaWrap" aria-live="polite">
           <div class="triviaHeader">
             <div class="triviaTitle">Trivia Round</div>
-            <div class="score" id="score">Score: 0 / 4</div>
           </div>
 
           <div class="q" data-q="0">
@@ -294,6 +280,22 @@
           </div>
         </div>
 
+        <!-- Reveal Poster CTA -->
+        <div class="toolbar">
+          <div class="chip" id="btnReveal">🎞 Reveal Poster</div>
+        </div>
+
+        <!-- Poster AFTER -->
+        <div class="artArea">
+          <div class="artFrame">
+            <a href="poster-web.jpg" target="_blank" rel="noopener">
+              <img id="poster" class="poster" src="poster-web.jpg" alt="All the Ways She Is poster artwork" />
+            </a>
+          </div>
+        </div>
+
+        <div class="caption">“Every detail here is something I associate with you.”</div>
+
         <div class="ending">
           “This isn’t everything you are — just the parts I’ve been lucky enough to notice so far.”
           <div class="sig">— Kaustubh</div>
@@ -309,29 +311,30 @@
     const poster = document.getElementById("poster");
 
     const triviaWrap = document.getElementById("trivia");
-    const btnTrivia = document.getElementById("btnTrivia");
-    const scoreEl = document.getElementById("score");
+    const btnReveal = document.getElementById("btnReveal");
 
     const ANSWERS = [
-      { correct: "B",
-        onCorrect: "Correct. Some close-ups don’t need dramatic lighting or music — they just need the right eyes.",
+      {
+        correct: "B",
+        onCorrect: "Correct. Exactly. The best close-ups don’t need dramatic lighting or music — they just need the right eyes.",
         onWrong: "Important too… but I’m still choosing green eyes every time."
       },
-      { correct: "C",
+      {
+        correct: "C",
         onCorrect: "Exactly. You always notice the story behind things — and that’s something I really admire about you.",
         onWrong: "Those matter… but story is what gives everything meaning. And you get that."
       },
-      { correct: "B",
+      {
+        correct: "B",
         onCorrect: "Correct. I’d prefer to keep my dignity intact.",
         onWrong: "Bold. I respect the confidence… but the odds aren’t in my favor."
       },
-      { correct: "C",
-        onCorrect: "Exactly. That feeling of wanting to see what happens next is the best part. I’m rooting for you.",
+      {
+        correct: "C",
+        onCorrect: "Exactly. That feeling of wanting to see what happens next is the best part. I’m rooting for yours.",
         onWrong: "All important… but it’s “what happens next” that keeps you leaning forward."
       }
     ];
-
-    let score = 0;
 
     function showScreen(el){
       [landing, main].forEach(s => s.classList.remove("visible","active"));
@@ -340,25 +343,23 @@
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    function revealPoster(){
-      // delay a tiny beat so it feels like a reveal
-      setTimeout(() => poster.classList.add("revealed"), 220);
-    }
-
     play.addEventListener("click", () => {
       showScreen(main);
-      revealPoster();
-    });
 
-    btnTrivia.addEventListener("click", () => {
+      // Open trivia first
       triviaWrap.classList.add("open");
       triviaWrap.scrollIntoView({ behavior:"smooth", block:"start" });
+
+      // Keep poster hidden until reveal
+      poster.classList.remove("revealed");
     });
 
-    function updateScore(){
-      scoreEl.textContent = `Score: ${score} / 4`;
-    }
+    btnReveal.addEventListener("click", () => {
+      poster.classList.add("revealed");
+      poster.scrollIntoView({ behavior:"smooth", block:"start" });
+    });
 
+    // Allow exploring answers freely (no score, no disabling)
     document.querySelectorAll(".q").forEach(qEl => {
       const qIndex = parseInt(qEl.getAttribute("data-q"), 10);
       const opts = qEl.querySelectorAll(".opt");
@@ -366,13 +367,14 @@
 
       opts.forEach(btn => {
         btn.addEventListener("click", () => {
-          opts.forEach(b => b.disabled = true);
-
           const chosen = btn.getAttribute("data-a");
           const isCorrect = chosen === ANSWERS[qIndex].correct;
 
-          if(isCorrect) score += 1;
-          updateScore();
+          // Reset styling so she can explore multiple answers
+          opts.forEach(b => {
+            b.style.borderColor = "rgba(255,255,255,0.12)";
+            b.style.background = "rgba(255,255,255,0.06)";
+          });
 
           feedback.hidden = false;
           feedback.innerHTML = isCorrect
@@ -384,8 +386,6 @@
         });
       });
     });
-
-    updateScore();
   </script>
 </body>
 </html>
